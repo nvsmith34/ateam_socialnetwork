@@ -1,0 +1,25 @@
+	VBox vbox = new VBox();
+		HBox hbox = new HBox();
+		Label user = new Label("Deb Deppeler");
+		user.setFont(new Font("Arial",30));
+		user.setWrapText(true);
+		Image userIm = new Image("user.jpg");
+		ImageView iv2 = new ImageView();
+		iv2.setImage(userIm);
+		hbox.getChildren().add(iv2);
+		hbox.getChildren().add(user);
+		hbox.setSpacing(20);
+		vbox.getChildren().add(hbox);
+		vbox.setSpacing(20);
+		
+		Label gender = new Label("Gender: Male");
+		gender.setFont(new Font("Arial",20));
+		vbox.getChildren().add(gender);
+		
+		Label school = new Label("School: UW-Madison");
+		school.setFont(new Font("Arial",20));
+		vbox.getChildren().add(school);
+		
+		Label relationship = new Label("Relationship Status: Complicated");
+		relationship.setFont(new Font("Arial",20));
+		vbox.getChildren().add(relationship);
