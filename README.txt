@@ -4,13 +4,11 @@ Course: cs400
 Semester: Fall 2019
 Project name: Social Network
 Team Members:
-1. member name1, lecture, and email1@wisc.edu
-2. member name2, lecture, and email2@wisc.edu
-3. member name3, lecture, and email3@wisc.edu
-4. member name4, lecture, and email4@wisc.edu
+1. Justin Paddock, LEC 001, jpaddock@wisc.edu
+2. Rishi Patel, LEC 001, rpatel46@wisc.edu
+3. Nate Smith, LEC 001, @wisc.edu
+4. Mohamed Alremeithi, LEC 001, malremeithi@wisc.edu
+5. Jake Wesson, LEC 001, jwesson@wisc.edu
 
-Notes or comments to the grader:
-
-[place any comments or notes that will help the grader here]
 
 
