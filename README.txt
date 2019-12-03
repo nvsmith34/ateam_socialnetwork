@@ -10,5 +10,6 @@ Team Members:
 4. Mohamed Alremeithi, LEC 001, malremeithi@wisc.edu
 5. Jake Wesson, LEC 001, jwesson@wisc.edu
 
-
+Notes:
+Justin and Mohamed on same xteam. Every other member on separate xteams.
 
