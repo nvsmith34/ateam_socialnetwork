@@ -109,7 +109,6 @@ public class SocialNetwork implements SocialNetworkADT {
 
 	@Override
 	public void saveToFile(File filename) throws IOException {
-		filename = new File("friends.txt");
 		
 		FileInputStream log = new FileInputStream(this.log);
 		FileOutputStream out = new FileOutputStream(filename);
