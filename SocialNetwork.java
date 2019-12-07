@@ -1,9 +1,12 @@
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.util.List;
+import java.util.Scanner;
 import java.util.Set;
 
 public class SocialNetwork implements SocialNetworkADT {
 	private Graph graph;
+	private Person mainUser;
 	
 	public SocialNetwork() {
 		graph = new Graph();
@@ -32,12 +35,18 @@ public class SocialNetwork implements SocialNetworkADT {
 
 	@Override
 	public boolean removeUser(String user) {
-		// TODO Auto-generated method stub
-		return false;
+		return graph.removeNode(graph.getNode(user))>0;
+		
 	}
 
 	@Override
 	public Set<Person> getFriends(String user) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+	
+	@Override
+	public Set<Person> getMutualFriends(String user1, String user2) {
 		// TODO Auto-generated method stub
 		return null;
 	}
@@ -55,15 +64,44 @@ public class SocialNetwork implements SocialNetworkADT {
 	}
 
 	@Override
-	public void loadFromFile(File filename) {
-		// TODO Auto-generated method stub
+	public void loadFromFile(File filename) throws FileNotFoundException {
+		Scanner scnr = new Scanner(filename);
 		
+		while(scnr.hasNextLine()) {
+			String input = scnr.nextLine();
+			String[] command = input.split(" ");
+			switch(command[0]) {
+			case "a" : if(command.length == 3)
+							addFriends(command[1],command[2]);
+						else if(command.length == 2)
+							addUser(command[1]);
+						
+						break;
+			case "r": if(command.length==3)
+							removeFriends(command[1],command[2]);
+					  else if(command.length ==2)
+						  removeUser(command[1]);
+			
+			case "s": if(command.length==2)
+						setMainUser(command[1]);
+						
+			}
+		}
+		
+	}
+	
+	public void setMainUser(String user) {
+		mainUser = graph.getNode(user);
+	}
+	
+	public Person getMainUser(String user) {
+		return mainUser;
 	}
 
 	@Override
-	public void saveToFile(File filename) {
-		// TODO Auto-generated method stub
-		
+	public void saveToFile(File filename) throws FileNotFoundException {
+
 	}
+
 
 }
