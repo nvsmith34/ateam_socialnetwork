@@ -1,5 +1,6 @@
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.List;
 import java.util.Set;
 
@@ -31,7 +32,7 @@ public interface SocialNetworkADT {
 	
 	public Set<Graph>	getConnectedComponents();
 	
-	public void loadFromFile(File filename) throws FileNotFoundException;
+	public Person loadFromFile(File filename) throws FileNotFoundException;
 	
-	public void saveToFile(File filename) throws FileNotFoundException;
+	public void saveToFile(File filename) throws FileNotFoundException, IOException;
 }

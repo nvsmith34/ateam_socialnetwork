@@ -1,15 +1,20 @@
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.List;
 import java.util.Scanner;
 import java.util.Set;
 
 public class SocialNetwork implements SocialNetworkADT {
 	private Graph graph;
-	private Person mainUser;
+	//private Person mainUser;
+	private File log;
 	
 	public SocialNetwork() {
 		graph = new Graph();
+		log = new File("log.txt");
 	}
 	@Override
 	public boolean addFriends(String user, String friend) {
@@ -47,8 +52,9 @@ public class SocialNetwork implements SocialNetworkADT {
 	
 	@Override
 	public Set<Person> getMutualFriends(String user1, String user2) {
-		// TODO Auto-generated method stub
-		return null;
+		Set<Person> mutual = getFriends(user1);
+				mutual.retainAll(getFriends(user2));
+		return mutual;
 	}
 
 	@Override
@@ -64,9 +70,9 @@ public class SocialNetwork implements SocialNetworkADT {
 	}
 
 	@Override
-	public void loadFromFile(File filename) throws FileNotFoundException {
+	public Person loadFromFile(File filename) throws FileNotFoundException {
 		Scanner scnr = new Scanner(filename);
-		
+		Person mainUser = null;
 		while(scnr.hasNextLine()) {
 			String input = scnr.nextLine();
 			String[] command = input.split(" ");
@@ -83,13 +89,14 @@ public class SocialNetwork implements SocialNetworkADT {
 						  removeUser(command[1]);
 			
 			case "s": if(command.length==2)
-						setMainUser(command[1]);
+						mainUser = graph.getNode(command[1]);
 						
 			}
 		}
-		
+		return mainUser;
 	}
 	
+	/**
 	public void setMainUser(String user) {
 		mainUser = graph.getNode(user);
 	}
@@ -97,10 +104,25 @@ public class SocialNetwork implements SocialNetworkADT {
 	public Person getMainUser(String user) {
 		return mainUser;
 	}
+	 * @throws IOException 
+	*/
 
 	@Override
-	public void saveToFile(File filename) throws FileNotFoundException {
-
+	public void saveToFile(File filename) throws IOException {
+		filename = new File("friends.txt");
+		
+		FileInputStream log = new FileInputStream(this.log);
+		FileOutputStream out = new FileOutputStream(filename);
+		
+		byte[]buffer = new byte[1024];
+		int length;
+		
+		while((length = log.read(buffer))>0) {
+			out.write(buffer,0,length);
+		}
+		
+		out.close();
+		log.close();
 	}
 
 
