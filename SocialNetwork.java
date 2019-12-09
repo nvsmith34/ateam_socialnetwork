@@ -192,6 +192,9 @@ public class SocialNetwork implements SocialNetworkADT {
       		}
       		int start = people.indexOf(per2);
       		int end = people.indexOf(per1);
+		if (pred[end] == null) {
+       			return null;
+      		}
       		int currIndex = end;
       		LinkedList<Person> theOrder = new LinkedList<Person>();
       		theOrder.add(per2); // not sure if final node should be included
