@@ -3,6 +3,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.PrintStream;
 import java.io.PrintWriter;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -15,15 +16,16 @@ public class SocialNetwork implements SocialNetworkADT {
 	private Graph graph;
 
 	private File log;
-	PrintWriter writer;
+	PrintStream writer;
 	
 	public SocialNetwork() throws FileNotFoundException {
 		graph = new Graph();
 		log = new File("log.txt");
-		writer = new PrintWriter(log);
+		writer = new PrintStream(log);
+
 	}
 	@Override
-	public boolean addFriends(String user, String friend) {
+	public boolean addFriends(String user, String friend) throws FileNotFoundException {
 		
 		  if (user == null || friend == null || user.length() == 0 || friend.length() == 0) {
 		      return false;
@@ -37,14 +39,16 @@ public class SocialNetwork implements SocialNetworkADT {
 		      per2 = new Person(friend);
 		    }
 		    if (graph.addEdge(per1, per2) == 1) {
+		    	//writer = new PrintWriter(log);
 		    	writer.println("a " + user +" " + friend);
+		    	//writer.close();
 		      return true;
 		    }
 		    return false;
 	}
 
 	@Override
-	public boolean removeFriends(String user, String friend) {
+	public boolean removeFriends(String user, String friend) throws FileNotFoundException {
 		 if (user == null || friend == null || user.length() == 0 || friend.length() == 0) {
 		      return false;
 		    }
@@ -57,33 +61,39 @@ public class SocialNetwork implements SocialNetworkADT {
 		      return false;
 		    }
 		    if (graph.removeEdge(per1, per2) == 1) {
+		    	//writer = new PrintWriter(log);
 		    	writer.println("r " + user + " " + friend);
+		    	//writer.close();
 		      return true;
 		    }
 		    return false;
 	}
 
 	@Override
-	public boolean addUser(String user) {
+	public boolean addUser(String user) throws FileNotFoundException {
 	    if (user == null || user.length() == 0) {
 	        return false;
 	      }
 	      Person person = new Person(user);
 	      if (graph.addNode(person) == 1) {
+	    		//writer = new PrintWriter(log);
 	    	  writer.println("a "+user);
+	    	//  writer.close();
 	        return true;
 	      }
 	      return false;
 	}
 
 	@Override
-	public boolean removeUser(String user) {
+	public boolean removeUser(String user) throws FileNotFoundException {
 	    if (user == null || user.length() == 0) {
 	        return false;
 	      }
 	      Person person = new Person(user);
 	      if (graph.removeNode(person) == 1) {
+	    	//	writer = new PrintWriter(log);
 	    	  writer.println("r " + user);
+	    	//  writer.close();
 	        return true;
 	      }
 	      return false;

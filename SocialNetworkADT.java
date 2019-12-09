@@ -7,9 +7,9 @@ import java.util.Set;
 public interface SocialNetworkADT {
 	
 
-	public boolean addFriends(String user,String friend);
+	public boolean addFriends(String user,String friend) throws FileNotFoundException;
 	
-	public boolean removeFriends(String user, String friend);
+	public boolean removeFriends(String user, String friend) throws FileNotFoundException;
 	
 	/**
 	 * adds user to the social network
@@ -19,10 +19,11 @@ public interface SocialNetworkADT {
 	 * 
 	 * @param user - user to add
 	 * @return true if user added, false if null or already exists
+	 * @throws FileNotFoundException 
 	 */
-	public boolean addUser(String user);
+	public boolean addUser(String user) throws FileNotFoundException;
 	
-	public boolean removeUser(String user);
+	public boolean removeUser(String user) throws FileNotFoundException;
 	
 	public Set<Person> getFriends(String user);
 	
