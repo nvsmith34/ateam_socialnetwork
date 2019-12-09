@@ -11,6 +11,8 @@ import java.util.List;
 import java.util.Queue;
 import java.util.Scanner;
 import java.util.Set;
+import java.util.PriorityQueue;
+import java.util.Arrays;
 
 public class SocialNetwork implements SocialNetworkADT {
 	private Graph graph;
@@ -128,11 +130,77 @@ public class SocialNetwork implements SocialNetworkADT {
 		return mutual;
 	}
 
-	@Override
-	public List<Person> getShortestPath(String user1, String user2) {
-		// TODO Auto-generated method stub
-		return null;
-	}
+	private class inPq implements Comparable<inPq> {
+      		private int dist;
+      		private Person thePerson;
+
+      		public inPq(Person p, int dist) {
+        		thePerson = p;
+        		this.dist = dist;
+      		}
+      		@Override
+      		public int compareTo(inPq comp) {
+      		  	return dist - comp.dist;
+      		}
+    	}
+
+    	@Override
+    	public List<Person> getShortestPath(String person1, String person2) {
+      		if (person1 == null || person2 == null || person1.length() == 0 || person2.length() == 0) {
+        		return null;
+      		}
+      		Person per1 = graph.getNode(person1);
+      		Person per2 = graph.getNode(person2);
+      		if (per1 == null || per2 == null) {
+        		return null;
+      		}
+      
+     		List<Person> people = Arrays.asList((((Person[])graph.getAllNodes().toArray())));
+      		int[] distance = new int[people.size()];
+      		boolean[] visited = new boolean[people.size()];
+      		Person[] pred = new Person[people.size()];
+      
+      		List<inPq> nodes = new LinkedList<inPq>();
+      		for (Person p : people) {
+        		inPq qAddition = new inPq(p, -1);
+        		nodes.add(qAddition);
+      		}
+      		PriorityQueue<inPq> pq = new PriorityQueue<inPq>();
+      		for (inPq in : nodes) {
+        		if (in.thePerson.getName().equals(person1)) {
+          			pq.add(in);
+          			in.dist = 0;
+          			distance[people.indexOf(in.thePerson)] = 0;
+          			visited[people.indexOf(in.thePerson)] = true;
+          			break;
+        		}
+      		}
+      		while (!pq.isEmpty()) {
+        		inPq currNode = pq.poll();
+        		visited[people.indexOf(currNode.thePerson)] = true;
+        		for (Person p : getFriends(currNode.thePerson.getName())) {
+          			int index = people.indexOf(p);
+          			if (!visited[index]) {
+            				if (distance[index] == -1 || distance[index] > (currNode.dist + 1)) {
+              					nodes.get(index).dist = currNode.dist + 1;
+              					distance[index] = currNode.dist + 1;
+              					pred[index] = currNode.thePerson;
+              					pq.add(nodes.get(index));
+            				}
+          			}
+        		}
+      		}
+      		int start = people.indexOf(per2);
+      		int end = people.indexOf(per1);
+      		int currIndex = end;
+      		LinkedList<Person> theOrder = new LinkedList<Person>();
+      		theOrder.add(per2); // not sure if final node should be included
+      		while (currIndex != start) {
+        		theOrder.addFirst(pred[currIndex]);
+        		currIndex = people.indexOf(pred[currIndex]);
+      		}
+      		return theOrder;
+    	}
 
 	@Override
 	public Set<Graph> getConnectedComponents() {
