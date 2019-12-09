@@ -117,6 +117,9 @@ public class SocialNetwork implements SocialNetworkADT {
 	      return friends;
 	}
 	
+	public Set<Person> getAllUsers(){
+		return graph.getAllNodes();
+	}
 	@Override
 	public Set<Person> getMutualFriends(String user1, String user2) {
 		Set<Person> mutual = getFriends(user1);//get friends of user1 in a Set
