@@ -3,6 +3,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -14,10 +15,12 @@ public class SocialNetwork implements SocialNetworkADT {
 	private Graph graph;
 
 	private File log;
+	PrintWriter writer;
 	
-	public SocialNetwork() {
+	public SocialNetwork() throws FileNotFoundException {
 		graph = new Graph();
 		log = new File("log.txt");
+		writer = new PrintWriter(log);
 	}
 	@Override
 	public boolean addFriends(String user, String friend) {
@@ -34,6 +37,7 @@ public class SocialNetwork implements SocialNetworkADT {
 		      per2 = new Person(friend);
 		    }
 		    if (graph.addEdge(per1, per2) == 1) {
+		    	writer.println("a " + user +" " + friend);
 		      return true;
 		    }
 		    return false;
@@ -53,6 +57,7 @@ public class SocialNetwork implements SocialNetworkADT {
 		      return false;
 		    }
 		    if (graph.removeEdge(per1, per2) == 1) {
+		    	writer.println("r " + user + " " + friend);
 		      return true;
 		    }
 		    return false;
@@ -65,6 +70,7 @@ public class SocialNetwork implements SocialNetworkADT {
 	      }
 	      Person person = new Person(user);
 	      if (graph.addNode(person) == 1) {
+	    	  writer.println("a "+user);
 	        return true;
 	      }
 	      return false;
@@ -77,6 +83,7 @@ public class SocialNetwork implements SocialNetworkADT {
 	      }
 	      Person person = new Person(user);
 	      if (graph.removeNode(person) == 1) {
+	    	  writer.println("r " + user);
 	        return true;
 	      }
 	      return false;
