@@ -199,6 +199,14 @@ public class SocialNetwork implements SocialNetworkADT {
 		scnr.close();
 		return mainUser;
 	}
+	
+	public int getNumUsers() {
+		return graph.order();
+	}
+	
+	public int getNumFriends() {
+		return graph.size();
+	}
 
 	@Override
 	public void saveToFile(File filename) throws IOException {
