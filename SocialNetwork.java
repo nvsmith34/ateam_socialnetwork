@@ -196,7 +196,6 @@ public class SocialNetwork implements SocialNetworkADT {
           			int index = people.indexOf(p);
           			if (!visited[index]) {
             				if (distance[index] == -1 || distance[index] > (currNode.dist + 1)) {
-            					System.out.println("howdy");
               					nodes.get(index).dist = currNode.dist + 1;
               					distance[index] = currNode.dist + 1;
               					pred[index] = currNode.thePerson;
