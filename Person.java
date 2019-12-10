@@ -1,7 +1,7 @@
 /**
  * This class represents one user in the social network.
  * 
- * @author Jake Wesson and the 400 Lads
+ * @author Jake Wesson
  */
 public class Person {
   private String name; // name of user
@@ -33,3 +33,4 @@ public class Person {
     this.name = name;
   }
 }
+

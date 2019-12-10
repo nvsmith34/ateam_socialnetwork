@@ -2,7 +2,9 @@ import java.util.List;
 import java.util.Set;
 
 /**
- * Filename: GraphADT.java Project: a3 Author: Jake Wesson
+ * Filename: GraphADT.java 
+ * Project: a3 
+ * Author: Jake Wesson
  * 
  * This interface describes methods for a graph class.
  */
@@ -75,7 +77,7 @@ public interface GraphADT {
 
 
   /**
-   * Get all the neighbors of a node.
+   * Get all the neighbors of a node. Returns null if node not in graph or node is null.
    * 
    * @param node the specified node
    * @return an List<String> of all the adjacent nodes for specified node
@@ -86,7 +88,7 @@ public interface GraphADT {
   /**
    * This method returns the Person associated with the provided string.
    * 
-   * @param node
+   * @param node - the name of the Person being looked for
    * @return the person associated with that String, null if not in graph
    */
   public Person getNode(String node);

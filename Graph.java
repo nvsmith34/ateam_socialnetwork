@@ -1,21 +1,3 @@
-///////////////////////////////////////////////////////////////////////////////
-// Program Name: Package Manager
-// Main Class File: PackageManager.java
-// File: Graph.java
-// Semester: Fall 2019 CS 400 Lecture 001
-//
-// Author: Jake Wesson (jwesson@wisc.edu)
-// CS Login: wesson
-// Lecturer's Name: Deb Deppeler
-//
-///////////////////////////////////////////////////////////////////////////////
-//
-// This program implements a graph as described in GraphADT. It contains
-// functionality for adding and removing edges and nodes, as well as returning
-// which nodes are adjacent to another node, and all of the nodes in the graph.
-//
-//////////////////////////// 80 columns wide //////////////////////////////////
-
 import java.util.List;
 import java.util.Set;
 import java.util.ArrayList;
@@ -23,11 +5,12 @@ import java.util.HashSet;
 
 
 /**
- * Filename: Graph.java Project: Social Network Visualizer a3 Authors: Jake Wesson
+ * Filename: Graph.java 
+ * Project: Social Network Visualizer 
+ * a3 Authors: Jake Wesson
  * 
- * Undirected and unweighted graph implementation.
+ * This class is an undirected and unweighted graph implementation.
  */
-
 public class Graph implements GraphADT {
 
   /**
@@ -58,7 +41,7 @@ public class Graph implements GraphADT {
   private int order; // number of nodes
 
   /**
-   * Default no-argument constructor
+   * This constructor just initializes all the fields.
    */
   public Graph() {
     nodes = new HashSet<GraphNode>();
@@ -160,6 +143,9 @@ public class Graph implements GraphADT {
         break;
       }
     }
+    if (n1.person.getName().equals(n2.person.getName())) {
+      return 0;
+    }
     for (GraphNode n : n1.neighbors) {
       if (n.person.getName().equals(n2.person.getName())) {
         return 0;
@@ -216,8 +202,7 @@ public class Graph implements GraphADT {
   }
 
   /**
-   * Returns a Set that contains all the nodes
-   * 
+   * This method returns a Set that contains all the nodes.
    */
   public Set<Person> getAllNodes() {
     Set<Person> returnedSet = new HashSet<Person>();
@@ -228,13 +213,15 @@ public class Graph implements GraphADT {
   }
 
   /**
-   * Get all the neighbor (adjacent) nodes of a node
-   *
+   * This method gets all the neighbors of a node.
    */
   public List<Person> getNeighbors(Person node) {
+    if (node == null) {
+      return null;
+    }
     GraphNode adjVertOf = null;
     for (GraphNode n : nodes) {
-      if (n.person.equals(node)) {
+      if (n.person.getName().equals(node.getName())) {
         adjVertOf = n;
       }
     }
@@ -249,7 +236,7 @@ public class Graph implements GraphADT {
   }
 
   /**
-   * This method returns the Person object based of the string provided to it.
+   * This method returns the Person object based off of the string provided to it.
    */
   public Person getNode(String name) {
     if (name == null) {
