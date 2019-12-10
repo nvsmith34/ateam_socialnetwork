@@ -1,3 +1,5 @@
+package application;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -12,7 +14,6 @@ import java.util.Queue;
 import java.util.Scanner;
 import java.util.Set;
 import java.util.PriorityQueue;
-import java.util.Arrays;
 
 public class SocialNetwork implements SocialNetworkADT {
 	private Graph graph;
@@ -20,10 +21,15 @@ public class SocialNetwork implements SocialNetworkADT {
 	private File log;
 	PrintStream writer;
 	
-	public SocialNetwork() throws FileNotFoundException {
+	public SocialNetwork() /*throws FileNotFoundException*/ {
 		graph = new Graph();
 		log = new File("log.txt");
-		writer = new PrintStream(log);
+		try {
+			writer = new PrintStream(log);
+		} catch (FileNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 
 	}
 	@Override
@@ -152,13 +158,21 @@ public class SocialNetwork implements SocialNetworkADT {
       		Person per1 = graph.getNode(person1);
       		Person per2 = graph.getNode(person2);
       		if (per1 == null || per2 == null) {
-        		return null;
+      			return null;
       		}
-      
-     		List<Person> people = Arrays.asList((((Person[])graph.getAllNodes().toArray())));
+      		
+     		List<Person> people = new LinkedList<Person>();
+     		for (Person p : graph.getAllNodes()) {
+     			people.add(p);
+     		}
+     		
       		int[] distance = new int[people.size()];
       		boolean[] visited = new boolean[people.size()];
       		Person[] pred = new Person[people.size()];
+      		
+      		for (int i = 0; i < distance.length; ++i) {
+      			distance[i] = -1;
+      		}
       
       		List<inPq> nodes = new LinkedList<inPq>();
       		for (Person p : people) {
@@ -182,6 +196,7 @@ public class SocialNetwork implements SocialNetworkADT {
           			int index = people.indexOf(p);
           			if (!visited[index]) {
             				if (distance[index] == -1 || distance[index] > (currNode.dist + 1)) {
+            					System.out.println("howdy");
               					nodes.get(index).dist = currNode.dist + 1;
               					distance[index] = currNode.dist + 1;
               					pred[index] = currNode.thePerson;
@@ -192,13 +207,13 @@ public class SocialNetwork implements SocialNetworkADT {
       		}
       		int start = people.indexOf(per2);
       		int end = people.indexOf(per1);
-		if (pred[end] == null) {
+      		if (pred[start] == null) {
        			return null;
       		}
-      		int currIndex = end;
+      		int currIndex = start;
       		LinkedList<Person> theOrder = new LinkedList<Person>();
       		theOrder.add(per2); // not sure if final node should be included
-      		while (currIndex != start) {
+      		while (currIndex != end) {
         		theOrder.addFirst(pred[currIndex]);
         		currIndex = people.indexOf(pred[currIndex]);
       		}
