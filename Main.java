@@ -74,6 +74,7 @@ public class Main extends Application {
 		// Create list view of users
 		
 		ObservableList<String> friendList = FXCollections.<String>observableArrayList();
+		ObservableList<String> userList = FXCollections.<String>observableArrayList();
 		Set<Person> friendSet = socialNetwork.getFriends(centralUser);
 		if (friendSet != null) {
 			for (Person p : friendSet) {
@@ -94,9 +95,12 @@ public class Main extends Application {
 		friendAddRemove.getChildren().addAll(viewFriend, removeFriend);
 		friendAddRemove.setSpacing(20);
 		
-
-		Button mutualFriends = new Button("View Mutual Friends");
 		
+		HBox mutualViewNetwork = new HBox();
+		Button mutualFriends = new Button("View Mutual Friends");
+		Button viewNetwork = new Button("View Network");
+		mutualViewNetwork.setSpacing(20);
+		mutualViewNetwork.getChildren().addAll(mutualFriends, viewNetwork);
 		
 		HBox labelForFriends = new HBox();
 		
@@ -106,7 +110,7 @@ public class Main extends Application {
 		labelForFriends.setAlignment(Pos.CENTER);
 		
 		vBoxRight.getChildren().addAll(labelForFriends, listOfFriends, 
-				friendAddRemove, mutualFriends);
+				friendAddRemove, mutualViewNetwork);
 		
 		borderPane.setRight(vBoxRight);
 		
@@ -209,19 +213,20 @@ public class Main extends Application {
 				
 				friends.getItems().clear();
 				friendList.clear();
-				
-				if (friendSet != null) {
-					for (Person p : friendSet) {
+				if (socialNetwork.getFriends(centralUser) != null) {
+					for (Person p : socialNetwork.getFriends(centralUser)) {
 						friendList.add(p.getName());
 					}
 				}
+				
+				
 				friends.getItems().addAll(friendList);
 				
 				addFriendshipField.setText("");
 				
 				
 			} else {
-				displayHelpMessage("Friendship already exists in network");
+				displayHelpMessage("Friendship cannot be added.");
 				addFriendshipField.setText("");
 			}
 		}
@@ -238,7 +243,6 @@ public class Main extends Application {
 					setCentralUser(friendList.get(0));
 				}
 				displayHelpMessage("File successfully loaded");
-				
 				if (friendSet != null) {
 					for (Person p: friendSet) {
 						friendList.add(p.getName());
@@ -265,8 +269,13 @@ public class Main extends Application {
 		
 		// Save file button
 		exportFileButton.setOnAction(e -> {
-			socialNetwork.saveToFile(new File("Saved_SocialNetowrk"));
-			displayHelpMessage("File saved to same directory as program location.");
+			try {
+				socialNetwork.saveToFile(new File("Saved_SocialNetowrk"));
+				displayHelpMessage("File saved to same directory as program location.");
+			} catch (Exception exception) {
+				displayHelpMessage("File could not be saved");
+			}
+			
 		}
 		);
 		
@@ -313,12 +322,13 @@ public class Main extends Application {
 				friendList.clear();
 				friends.getItems().clear();
 				
-				if (friendSet != null) {
-					for (Person p : friendSet) {
+				if (socialNetwork.getFriends(centralUser) != null) {
+					for (Person p : socialNetwork.getFriends(centralUser)) {
 						friendList.add(p.getName());
 					}
 				}
 				
+				viewNetwork.setText("View Network");
 				friends.getItems().addAll(friendList);
 				friendsDisplay.setText(centralUser + "'s Friends");
 				
@@ -333,33 +343,51 @@ public class Main extends Application {
 		// Remove friend button
 		removeFriend.setOnAction(e -> {
 			if (friends.getSelectionModel().getSelectedItem() != null) {
-				System.out.println(friendSet.toString().toString());
-				if (socialNetwork.removeFriends(centralUser, 
-						friends.getSelectionModel().getSelectedItem().trim())) {
-					socialNetwork.removeFriends(centralUser, 
-							friends.getSelectionModel().getSelectedItem().trim());
-					
-					friendList.clear();
-					friends.getItems().clear();
-					
-					if (friendSet != null) {
-						for (Person p : friendSet) {
-							friendList.add(p.getName());
+				if (removeFriend.getText().equals("Remove Friend")) {
+					if (socialNetwork.removeFriends(centralUser, 
+							friends.getSelectionModel().getSelectedItem().trim())) {
+						socialNetwork.removeFriends(centralUser, 
+								friends.getSelectionModel().getSelectedItem().trim());
+						
+						friendList.clear();
+						friends.getItems().clear();
+						
+						if (socialNetwork.getFriends(centralUser) != null) {
+							for (Person p : socialNetwork.getFriends(centralUser)) {
+								friendList.add(p.getName());
+							}
+						} 
+						
+						friends.getItems().addAll(friendList);
+						
+						displayHelpMessage("Friend successfully removed!");
+						
+						numFriendshipsLabel.setText("Number of Friendships in Social Network:" + 
+								socialNetwork.numFriendships());
+						
+						numGroupsLabel.setText("Number of Groups in Social Network:" + 
+								socialNetwork.numConnectedComponents());
+						
+					} else {
+						displayHelpMessage("Friendship does not exist.");
+					}
+				}
+				else {
+					if (socialNetwork.removeUser(friends.getSelectionModel().getSelectedItem())) {
+						displayHelpMessage(friends.getSelectionModel().getSelectedItem() + 
+								" successfully removed from the Social Network.");
+						
+						friends.getItems().clear();
+						userList.clear();
+						for (Person p: socialNetwork.getAllUsers()) {
+							userList.add(p.getName());
 						}
-					} 
-					
-					friends.getItems().addAll(friendList);
-					
-					displayHelpMessage("Friend successfully removed!");
-					
-					numFriendshipsLabel.setText("Number of Friendships in Social Network:" + 
-							socialNetwork.numFriendships());
-					
-					numGroupsLabel.setText("Number of Groups in Social Network:" + 
-							socialNetwork.numConnectedComponents());
-					
-				} else {
-					displayHelpMessage("Friendship does not exist.");
+						friends.getItems().addAll(userList);
+					}
+					else {
+						displayHelpMessage(friends.getSelectionModel().getSelectedItem() + 
+								" could not be removed from the Social Network.");
+					}
 				}
 				
 			} else {
@@ -389,6 +417,37 @@ public class Main extends Application {
 		}
 		);
 		
+		// View network button
+		viewNetwork.setOnAction(e -> {
+			if (viewNetwork.getText().contentEquals("View Network")) {
+				displayHelpMessage("Displaying all of the users.");
+				friendsDisplay.setText("All Users in current Social Network");
+				userList.clear();
+				friends.getItems().clear();
+				for (Person p : socialNetwork.getAllUsers()) {
+					userList.add(p.getName());
+				}
+				friends.getItems().addAll(userList);
+				viewFriend.setText("View User");
+				removeFriend.setText("Remove User");
+				viewNetwork.setText("View Friends");
+				}
+			else {
+				displayHelpMessage("Displaying friends of " + centralUser + ".");
+				friendsDisplay.setText(centralUser + "'s friends");
+				friendList.clear();
+				friends.getItems().clear();
+				for (Person p: socialNetwork.getFriends(centralUser)) {
+					friendList.add(p.getName());
+				}
+				friends.getItems().addAll(friendList);
+				viewFriend.setText("View Friend");
+				removeFriend.setText("Remove Friend");
+				viewNetwork.setText("View Network");
+			}
+		}
+		);
+		
 		// Alert (with buttons) to be showed upon exit
 		Alert alert = new Alert(AlertType.CONFIRMATION);
 		alert.setTitle("Exit");
@@ -404,8 +463,11 @@ public class Main extends Application {
 			Optional<ButtonType> result = alert.showAndWait();
 			
 			if (result.get() == saveAndExit) {
-				socialNetwork.saveToFile(new File("Saved_SocialNetwork"));
-				System.out.println("File saved");
+				try {
+					socialNetwork.saveToFile(new File("Saved_SocialNetwork"));
+				} catch (Exception exception) {
+					
+				}
 			}
 		}
 		);
