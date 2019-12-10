@@ -1,6 +1,7 @@
 package application;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -26,6 +27,7 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Font;
+import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 
 public class Main extends Application {
@@ -42,14 +44,21 @@ public class Main extends Application {
 	private VBox vBoxRight = new VBox();
 	private VBox centralUserDisplay = new VBox();
 	private String centralUser;
-	private SocialNetwork socialNetwork = new SocialNetwork();
+	private SocialNetwork socialNetwork;
 	
 	@Override
 	public void start(Stage primaryStage) throws Exception {
 		// save args example
 		args = this.getParameters().getRaw();
 		
+		
 		BorderPane borderPane = new BorderPane();
+		try {
+			socialNetwork = new SocialNetwork();
+			
+		} catch (Exception e) {
+			displayHelpMessage("Could not make log file to write to");
+		}
 
 		Label topLabel = new Label("Social Network");
 		topLabel.setFont(new Font("Arial", 24));
@@ -124,8 +133,7 @@ public class Main extends Application {
 		HBox shortestPath = new HBox();
 		
 		Button loadFileButton = new Button("Load File");
-		TextField loadFileField = new TextField();
-		loadFile.getChildren().addAll(loadFileField, loadFileButton);
+		loadFile.getChildren().addAll(loadFileButton);
 		loadFile.setSpacing(10);
 		
 		Button exportFileButton = new Button("Export Social Network Data to File");
@@ -147,13 +155,13 @@ public class Main extends Application {
 		shortestPath.setSpacing(10);
 		
 		Label numUsersLabel = new Label("Number of Users in Social Network: " +
-		socialNetwork.numUsers());
+		socialNetwork.getNumUsers());
 		
-		Label numFriendshipsLabel = new Label("Number of Friendships in SocialNetwork: " +
-		socialNetwork.numFriendships());
+		Label numFriendshipsLabel = new Label("Number of Friendships in Social Network: " +
+		socialNetwork.getNumFriends());
 		
 		Label numGroupsLabel = new Label("Number of Groups in Social Network: " 
-				+ socialNetwork.numConnectedComponents());
+				+ socialNetwork.getConnectedComponents().size());
 
 		
 		vBoxLeft.getChildren().addAll(loadFile, exportFile, addUserOption,
@@ -170,21 +178,36 @@ public class Main extends Application {
 		
 		// Add user button
 		addUserButton.setOnAction(e -> { 
-			if (socialNetwork.addUser(addUserField.getText())) {
-				displayHelpMessage("Successfully added user!");
-				numUsersLabel.setText("Number of Users in Social Network: " +
-						socialNetwork.numUsers());
-				numGroupsLabel.setText("Number of Groups in Social Network: " + 
-						socialNetwork.numConnectedComponents());
-				if (centralUser == null) {
-					setCentralUser(addUserField.getText());
-					friendsDisplay.setText(centralUser + "'s Friends");
+			try {
+				if (socialNetwork.addUser(addUserField.getText().trim().split(" ")[0])) {
+					
+					displayHelpMessage("Successfully added user!");
+					numUsersLabel.setText("Number of Users in Social Network: " +
+							socialNetwork.getNumUsers());
+					numGroupsLabel.setText("Number of Groups in Social Network: " + 
+							socialNetwork.getConnectedComponents().size());
+					if (centralUser == null) {
+						setCentralUser(addUserField.getText().trim().split(" ")[0]);
+						friendsDisplay.setText(centralUser + "'s Friends");
+					}
+					addUserField.setText("");
+					
+					if (viewNetwork.getText().equals("View Friends")) {
+						friends.getItems().clear();
+						userList.clear();
+						for (Person p : socialNetwork.getAllUsers()) {
+							userList.add(p.getName());
+						}
+						friends.getItems().addAll(userList);
+					}
+					
 				}
-				addUserField.setText("");
-			}
-			else {
-				displayHelpMessage("Could not add user to network.");
-				addUserField.setText("");
+				else {
+					displayHelpMessage("Could not add user to network.");
+					addUserField.setText("");
+				}
+			} catch (Exception exception) {
+				displayHelpMessage("Log file could not be written to.");
 			}
 		}
 		);
@@ -201,68 +224,78 @@ public class Main extends Application {
 				addFriendshipField.setText("");
 				return;
 			}
-			
-			if (socialNetwork.addFriends(centralUser, addFriendshipField.getText())) {
-				displayHelpMessage("Successfully added friendship with central user!");
-				numFriendshipsLabel.setText("Number of Friendships in Social Network: " +
-						socialNetwork.numFriendships());
-				numGroupsLabel.setText("Number of Groups in Social Network: " + 
-						socialNetwork.numConnectedComponents());
-				numUsersLabel.setText("Number of Users in Social Network: " + 
-						socialNetwork.numUsers());
-				
-				friends.getItems().clear();
-				friendList.clear();
-				if (socialNetwork.getFriends(centralUser) != null) {
-					for (Person p : socialNetwork.getFriends(centralUser)) {
-						friendList.add(p.getName());
+			try {
+				if (socialNetwork.addFriends(centralUser, 
+						addFriendshipField.getText().trim().split(" ")[0])) {
+					displayHelpMessage("Successfully added friendship with central user!");
+					numFriendshipsLabel.setText("Number of Friendships in Social Network: " +
+							socialNetwork.getNumFriends());
+					numGroupsLabel.setText("Number of Groups in Social Network: " + 
+							socialNetwork.getConnectedComponents().size());
+					numUsersLabel.setText("Number of Users in Social Network: " + 
+							socialNetwork.getNumUsers());
+					
+					if (viewNetwork.getText().equals("View Network")) {
+						friends.getItems().clear();
+						friendList.clear();
+						if (socialNetwork.getFriends(centralUser) != null) {
+							for (Person p : socialNetwork.getFriends(centralUser)) {
+								friendList.add(p.getName());
+							}
+						}
+						friends.getItems().addAll(friendList);
+					} else {
+						friends.getItems().clear();
+						friendList.clear();
+						if (socialNetwork.getAllUsers() != null) {
+							for (Person p : socialNetwork.getAllUsers()) {
+								friendList.add(p.getName());
+							}
+						}
+						friends.getItems().addAll(friendList);
 					}
-				}
-				
-				
-				friends.getItems().addAll(friendList);
-				
-				addFriendshipField.setText("");
+					
+					addFriendshipField.setText("");
 				
 				
 			} else {
 				displayHelpMessage("Friendship cannot be added.");
 				addFriendshipField.setText("");
 			}
+			} catch (Exception exception) {
+				displayHelpMessage("Log file could not be written to");
+			}
 		}
 		);
 		
-		// Load file button
+		
+		FileChooser fil_chooser = new FileChooser();
 		loadFileButton.setOnAction(e -> {
 			try {
-				if (socialNetwork.loadFromFile(
-						new File(loadFileField.getText())).getName() != null) {
-					setCentralUser(socialNetwork.loadFromFile(
-							new File(loadFileField.getText())).getName());
+				File file = fil_chooser.showOpenDialog(primaryStage);
+				Person loadedCentralUser = null;
+				loadedCentralUser = socialNetwork.loadFromFile(file);
+				if (loadedCentralUser != null) {
+					setCentralUser(loadedCentralUser.getName());
 				} else {
 					setCentralUser(friendList.get(0));
 				}
 				displayHelpMessage("File successfully loaded");
-				if (friendSet != null) {
-					for (Person p: friendSet) {
+				if (socialNetwork.getFriends(centralUser) != null) {
+					for (Person p: socialNetwork.getFriends(centralUser)) {
 						friendList.add(p.getName());
 					}
 				}
-				
 				friends.getItems().addAll(friendList);
-				
 				numUsersLabel.setText("Number of Users in Social Network: " +
 						socialNetwork.numUsers());
 				numFriendshipsLabel.setText("Number of Friendships in SocialNetwork: " +
-						socialNetwork.numFriendships());
-				numGroupsLabel.setText("Number of Groups in Social Network: " + 
-						socialNetwork.numConnectedComponents());
-				
-				loadFileField.setText("");
+						socialNetwork.getNumFriends());
+				numGroupsLabel.setText("Number of Groups in Social Network: " +
+						socialNetwork.getConnectedComponents().size());
 				
 			} catch (Exception exception) {
 				displayHelpMessage("File could not be read");
-				loadFileField.setText("");
 			}
 		}
 		);
@@ -293,12 +326,19 @@ public class Main extends Application {
 				if (socialNetwork.getShortestPath(
 						shortestPathField.getText().trim().split(" ")[0].trim(),
 						shortestPathField.getText().trim().split(" ")[1].trim()) != null) {
+					
+					List<String> names = new ArrayList<String>();
+					for (Person p : socialNetwork.getShortestPath(
+							shortestPathField.getText().trim().split(" ")[0].trim(),
+							shortestPathField.getText().trim().split(" ")[1].trim())) {
+						names.add(p.getName());
+		}
+					
 					displayHelpMessage("Shortest path between " + 
 						shortestPathField.getText().trim().split(" ")[0].trim() + " and " + 
 						shortestPathField.getText().trim().split(" ")[1].trim() + ": " 
-							+ socialNetwork.getShortestPath(
-							shortestPathField.getText().trim().split(" ")[0].trim(),
-							shortestPathField.getText().trim().split(" ")[1].trim()).toString());
+							+ names.toString());
+						
 				} else {
 					displayHelpMessage("The path between these two users does not exist.");
 				}
@@ -316,6 +356,11 @@ public class Main extends Application {
 		// View friend button
 		viewFriend.setOnAction(e -> {
 			if (friends.getSelectionModel().getSelectedItem() != null) {
+				
+				viewFriend.setText("View Friend");
+				viewNetwork.setText("View Network");
+				removeFriend.setText("Remove Friend");
+				
 				setCentralUser(friends.getSelectionModel().getSelectedItem());
 				displayHelpMessage("Central user switched to " + centralUser);
 				
@@ -342,57 +387,75 @@ public class Main extends Application {
 		
 		// Remove friend button
 		removeFriend.setOnAction(e -> {
-			if (friends.getSelectionModel().getSelectedItem() != null) {
-				if (removeFriend.getText().equals("Remove Friend")) {
-					if (socialNetwork.removeFriends(centralUser, 
-							friends.getSelectionModel().getSelectedItem().trim())) {
-						socialNetwork.removeFriends(centralUser, 
-								friends.getSelectionModel().getSelectedItem().trim());
-						
-						friendList.clear();
-						friends.getItems().clear();
-						
-						if (socialNetwork.getFriends(centralUser) != null) {
-							for (Person p : socialNetwork.getFriends(centralUser)) {
-								friendList.add(p.getName());
-							}
-						} 
-						
-						friends.getItems().addAll(friendList);
-						
-						displayHelpMessage("Friend successfully removed!");
-						
-						numFriendshipsLabel.setText("Number of Friendships in Social Network:" + 
-								socialNetwork.numFriendships());
-						
-						numGroupsLabel.setText("Number of Groups in Social Network:" + 
-								socialNetwork.numConnectedComponents());
-						
-					} else {
-						displayHelpMessage("Friendship does not exist.");
-					}
-				}
-				else {
-					if (socialNetwork.removeUser(friends.getSelectionModel().getSelectedItem())) {
-						displayHelpMessage(friends.getSelectionModel().getSelectedItem() + 
-								" successfully removed from the Social Network.");
-						
-						friends.getItems().clear();
-						userList.clear();
-						for (Person p: socialNetwork.getAllUsers()) {
-							userList.add(p.getName());
+			try {
+				if (friends.getSelectionModel().getSelectedItem() != null) {
+					if (removeFriend.getText().equals("Remove Friend")) {
+						if (socialNetwork.removeFriends(centralUser, 
+								friends.getSelectionModel().getSelectedItem().trim())) {
+							socialNetwork.removeFriends(centralUser, 
+									friends.getSelectionModel().getSelectedItem().trim());
+							
+							friendList.clear();
+							friends.getItems().clear();
+							
+							if (socialNetwork.getFriends(centralUser) != null) {
+								for (Person p : socialNetwork.getFriends(centralUser)) {
+									friendList.add(p.getName());
+								}
+							} 
+							
+							friends.getItems().addAll(friendList);
+							
+							displayHelpMessage("Friend successfully removed!");
+							
+							numFriendshipsLabel.setText("Number of Friendships in Social Network:" + 
+									socialNetwork.getNumFriends());
+							
+							numGroupsLabel.setText("Number of Groups in Social Network:" + 
+									socialNetwork.getConnectedComponents().size());
+							
+						} else {
+							displayHelpMessage("Friendship does not exist.");
 						}
-						friends.getItems().addAll(userList);
 					}
 					else {
-						displayHelpMessage(friends.getSelectionModel().getSelectedItem() + 
-								" could not be removed from the Social Network.");
+						if (friends.getSelectionModel().getSelectedItem().equals(centralUser)) {
+							displayHelpMessage("Cannot remove central user from the network. Please"
+									+ " select another central user if you wish to remove this user");
+							return;
+						}
+							
+						if (socialNetwork.removeUser(friends.getSelectionModel().getSelectedItem())) {
+							displayHelpMessage(friends.getSelectionModel().getSelectedItem() + 
+									" successfully removed from the Social Network.");
+							
+							friends.getItems().clear();
+							userList.clear();
+							for (Person p: socialNetwork.getAllUsers()) {
+								userList.add(p.getName());
+							}
+							friends.getItems().addAll(userList);
+							
+							numUsersLabel.setText("Number of Users in Social Network: " +
+									socialNetwork.getNumUsers());
+							numFriendshipsLabel.setText("Number of Friendships in Social Network: " +
+									socialNetwork.getNumFriends());
+							numGroupsLabel.setText("Number of Groups in Social Network: " + 
+									socialNetwork.getConnectedComponents().size());
+							
+						}
+						else {
+							displayHelpMessage(friends.getSelectionModel().getSelectedItem() + 
+									" could not be removed from the Social Network.");
+						}
 					}
+					
+				} else {
+					displayHelpMessage("No item selected on the ListView. There needs to"
+							+ " be a person selected to perform this action.");
 				}
-				
-			} else {
-				displayHelpMessage("No item selected on the ListView. There needs to"
-						+ " be a person selected to perform this action.");
+			} catch (Exception exception) {
+				displayHelpMessage("Log file could not be written to.");
 			}
 		}
 		);
